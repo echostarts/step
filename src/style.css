@@ -1,0 +1,649 @@
+/* ОТРЕЧЁННЫЕ — единый стиль UI: тёмные панели, тонкие рамки, готика в заголовках */
+
+:root {
+  --panel: rgba(12, 15, 22, 0.92);
+  --panel-2: rgba(18, 22, 32, 0.95);
+  --border: #3a4254;
+  --border-dim: #262c3a;
+  --text: #c9d2e0;
+  --text-dim: #7c8699;
+  --accent: #c8a96a;
+  --blood: #b34a3f;
+  --heal: #6fae6a;
+  --cold: #86a8d8;
+  --font-head: 'Grenze Gotisch', serif;
+  --font-body: 'Segoe UI', 'Roboto', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #07090d;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+#game {
+  position: fixed;
+  inset: 0;
+  display: block;
+}
+
+#labels {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 5;
+}
+
+/* виньетка — дешёвый и честный пост-эффект */
+#vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+  background: radial-gradient(ellipse at center, transparent 52%, rgba(2, 3, 6, 0.55) 100%);
+}
+
+#ui {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+#ui > * {
+  pointer-events: auto;
+}
+
+/* ---------- иконки game-icons (маска, перекраска в палитру) ---------- */
+.gi {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  background: currentColor;
+  -webkit-mask: var(--icon) no-repeat center / contain;
+  mask: var(--icon) no-repeat center / contain;
+  vertical-align: middle;
+}
+.gi.big {
+  width: 34px;
+  height: 34px;
+}
+
+/* ---------- HUD ---------- */
+.hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+.hud > * {
+  pointer-events: auto;
+}
+
+.hud-bottom {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: linear-gradient(transparent, rgba(5, 7, 11, 0.88) 40%);
+}
+
+.portrait-bar {
+  display: flex;
+  gap: 8px;
+}
+
+.portrait {
+  position: relative;
+  width: 86px;
+  background: var(--panel);
+  border: 1px solid var(--border-dim);
+  border-radius: 3px;
+  padding: 4px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.portrait:hover {
+  border-color: var(--accent);
+}
+.portrait.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 12px rgba(200, 169, 106, 0.25);
+}
+.portrait.down {
+  filter: grayscale(0.9) brightness(0.55);
+}
+.portrait img {
+  width: 100%;
+  height: 84px;
+  object-fit: cover;
+  border-radius: 2px;
+  background: #11151d;
+  display: block;
+}
+.p-name {
+  font-family: var(--font-head);
+  font-size: 14px;
+  text-align: center;
+  color: var(--text);
+  padding: 2px 0;
+  letter-spacing: 0.04em;
+}
+.bar {
+  position: relative;
+  height: 8px;
+  background: #1a1f2b;
+  border-radius: 2px;
+  margin-top: 3px;
+  overflow: hidden;
+}
+.bar i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  display: block;
+  border-radius: 2px;
+}
+.bar.hp i {
+  background: linear-gradient(90deg, #7a3a32, #b34a3f);
+}
+.bar.ap i {
+  background: linear-gradient(90deg, #3d5878, #86a8d8);
+}
+.bar b {
+  position: absolute;
+  inset: 0;
+  font-size: 8px;
+  line-height: 8px;
+  text-align: center;
+  color: #e8edf5;
+  font-weight: 600;
+  text-shadow: 0 1px 2px #000;
+}
+.p-statuses {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 2px;
+}
+.p-statuses .gi {
+  width: 14px;
+  height: 14px;
+}
+.st-bleed {
+  color: #c94f42;
+}
+.st-burn {
+  color: #e8923c;
+}
+.st-stun {
+  color: #d8c66a;
+}
+.p-key {
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+/* панель действий */
+.action-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  background: var(--panel);
+  border: 1px solid var(--border-dim);
+  border-radius: 4px;
+  padding: 8px;
+}
+.weapon-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 10px;
+  border-right: 1px solid var(--border-dim);
+  color: var(--accent);
+}
+.w-name {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 3px;
+  white-space: nowrap;
+}
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 64px;
+  padding: 7px 6px;
+  border: 1px solid var(--border-dim);
+  border-radius: 3px;
+  background: var(--panel-2);
+  color: var(--cold);
+  cursor: pointer;
+  transition:
+    border-color 0.12s,
+    background 0.12s;
+}
+.action-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.action-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(200, 169, 106, 0.1);
+}
+.action-btn.disabled {
+  opacity: 0.35;
+  cursor: default;
+  pointer-events: none;
+}
+.a-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-align: center;
+  max-width: 76px;
+}
+.action-btn:hover .a-label {
+  color: var(--text);
+}
+
+.quick-slots {
+  display: flex;
+  gap: 4px;
+  padding: 0 6px;
+  border-left: 1px solid var(--border-dim);
+  border-right: 1px solid var(--border-dim);
+}
+.q-slot {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border-dim);
+  border-radius: 3px;
+  background: var(--panel-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+}
+.q-slot.usable {
+  color: var(--cold);
+  cursor: pointer;
+}
+.q-slot.usable:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.q-slot b {
+  position: absolute;
+  right: 3px;
+  bottom: 1px;
+  font-size: 10px;
+  color: var(--text);
+}
+.q-slot.empty {
+  opacity: 0.4;
+}
+
+.menu-btn {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  font-size: 22px;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+.menu-btn:hover {
+  color: var(--accent);
+}
+
+/* инициатива */
+.initiative-bar {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--panel);
+  border: 1px solid var(--border-dim);
+  border-radius: 4px;
+  padding: 6px 12px;
+}
+.round-label {
+  font-family: var(--font-head);
+  color: var(--accent);
+  margin-right: 8px;
+  font-size: 16px;
+  letter-spacing: 0.06em;
+}
+.init-chip {
+  width: 30px;
+  height: 30px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid var(--border-dim);
+}
+.init-chip.ally {
+  background: #1d2c40;
+  color: #9cc0ea;
+}
+.init-chip.foe {
+  background: #36201d;
+  color: #d98a7c;
+}
+.init-chip.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 8px rgba(200, 169, 106, 0.4);
+}
+.init-chip.unseen {
+  opacity: 0.35;
+}
+.enemy-turn-label {
+  margin-left: 10px;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* карточка врага */
+.enemy-card {
+  position: fixed;
+  right: 14px;
+  top: 64px;
+  width: 230px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 10px 12px;
+  z-index: 6;
+}
+.enemy-card header {
+  font-family: var(--font-head);
+  font-size: 19px;
+  color: var(--blood);
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+.ec-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+  color: var(--text-dim);
+}
+.ec-row b {
+  color: var(--text);
+}
+.ec-chance {
+  margin: 8px 0 4px;
+  font-size: 16px;
+  color: var(--text);
+}
+.ec-chance b {
+  color: var(--accent);
+  font-size: 19px;
+}
+.ec-chance.blocked {
+  color: var(--blood);
+}
+.ec-parts {
+  border-top: 1px solid var(--border-dim);
+  margin-top: 6px;
+  padding-top: 5px;
+}
+.ec-part {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-dim);
+  padding: 1px 0;
+}
+.ec-part .pos {
+  color: var(--heal);
+}
+.ec-part .neg {
+  color: var(--blood);
+}
+.ec-flank {
+  margin-top: 5px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* подсказка и тосты */
+.hint-line {
+  position: fixed;
+  bottom: 148px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--text-dim);
+  font-size: 11px;
+  opacity: 0.75;
+  pointer-events: none !important;
+}
+.toast {
+  position: fixed;
+  top: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px 18px;
+  color: var(--accent);
+  z-index: 20;
+  pointer-events: none !important;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* плавающие числа урона */
+.float-label {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-head);
+  font-size: 21px;
+  font-weight: 600;
+  text-shadow: 0 2px 4px #000;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.float-label.dmg {
+  color: #e06352;
+}
+.float-label.crit {
+  color: #ffb347;
+  font-size: 26px;
+}
+.float-label.miss {
+  color: #8d96a8;
+  font-style: italic;
+  font-size: 17px;
+}
+.float-label.heal {
+  color: #7ec877;
+}
+.float-label.fire {
+  color: #f09542;
+}
+.float-label.status {
+  color: #d8c66a;
+  font-size: 15px;
+}
+
+/* ---------- Экраны ---------- */
+.screen-layer {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(4, 6, 10, 0.82);
+  z-index: 30;
+}
+.screen-layer.menu-screen {
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(38, 50, 78, 0.35), transparent 60%),
+    rgba(4, 6, 10, 0.96);
+}
+
+.menu-box {
+  width: min(560px, 92vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 36px 44px;
+  text-align: center;
+  box-shadow: 0 14px 60px rgba(0, 0, 0, 0.7);
+}
+.menu-box.small {
+  width: min(380px, 92vw);
+}
+
+.game-title {
+  font-family: var(--font-head);
+  font-size: clamp(34px, 5.5vw, 52px);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  text-shadow: 0 0 28px rgba(200, 169, 106, 0.25);
+  white-space: nowrap;
+}
+.game-sub {
+  color: var(--text-dim);
+  font-style: italic;
+  margin: 6px 0 28px;
+}
+.screen-title {
+  font-family: var(--font-head);
+  font-size: 38px;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 18px;
+}
+.screen-title.vict {
+  color: var(--accent);
+}
+.screen-title.def {
+  color: var(--blood);
+}
+
+.menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+.menu-item {
+  font-family: var(--font-head);
+  font-size: 21px;
+  letter-spacing: 0.08em;
+  padding: 10px;
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border-dim);
+  border-radius: 3px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    color 0.15s,
+    background 0.15s;
+}
+.menu-item:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(200, 169, 106, 0.06);
+}
+.menu-foot {
+  margin-top: 26px;
+  color: var(--text-dim);
+  font-size: 11px;
+  font-style: italic;
+}
+
+.result-xp {
+  font-size: 17px;
+  color: var(--text);
+  margin: 8px 0;
+}
+.result-xp .gi {
+  color: var(--accent);
+  margin-right: 6px;
+}
+.result-sub {
+  font-family: var(--font-head);
+  color: var(--text-dim);
+  font-size: 19px;
+  margin: 14px 0 6px;
+  letter-spacing: 0.06em;
+}
+.result-loot,
+.result-injuries {
+  color: var(--text);
+  line-height: 1.7;
+}
+.result-text {
+  color: var(--text-dim);
+  font-style: italic;
+  margin: 10px 0 6px;
+}
+.result-loot .gi {
+  color: var(--accent);
+  margin: 0 4px -4px 8px;
+}
+.result-injuries .neg {
+  color: var(--blood);
+}
+
+.credits-list {
+  text-align: left;
+  margin: 10px 0;
+}
+.credit-line {
+  color: var(--text);
+  margin: 10px 0;
+  line-height: 1.5;
+}
+
+/* загрузка */
+.loading-note {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--text-dim);
+  font-style: italic;
+  z-index: 40;
+  pointer-events: none;
+}

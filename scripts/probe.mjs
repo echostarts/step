@@ -1,0 +1,10 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch();
+const p = await b.newPage({viewport:{width:1280,height:720}});
+p.on('console', m => console.log('[' + m.type() + ']', m.text().slice(0,200)));
+p.on('pageerror', e => console.log('[pageerror]', String(e).slice(0,400)));
+await p.goto('http://localhost:5199/?seed=chern');
+await p.waitForTimeout(1500);
+await p.click('text=Новая игра');
+await p.waitForTimeout(30000);
+await b.close();
