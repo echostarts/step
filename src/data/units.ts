@@ -96,6 +96,7 @@ export const ENEMIES: Record<string, UnitTemplate> = {
     xpValue: 50,
     aiRole: 'brute',
     scale: 1.08,
+    drops: [{ id: 'bandage', count: 1 }],
   },
   cultist: {
     defId: 'cultist',
@@ -109,6 +110,7 @@ export const ENEMIES: Record<string, UnitTemplate> = {
     armorId: 'leather',
     xpValue: 45,
     aiRole: 'flanker',
+    drops: [{ id: 'potion', count: 1 }],
   },
   cultist_crossbow: {
     defId: 'cultist_crossbow',
@@ -121,6 +123,7 @@ export const ENEMIES: Record<string, UnitTemplate> = {
     weaponId: 'crossbow',
     xpValue: 50,
     aiRole: 'shooter',
+    drops: [{ id: 'bolts', count: 5 }],
   },
   cultist_alchemist: {
     defId: 'cultist_alchemist',
@@ -134,6 +137,7 @@ export const ENEMIES: Record<string, UnitTemplate> = {
     spareWeaponId: 'cultist_blade',
     xpValue: 60,
     aiRole: 'alchemist',
+    drops: [{ id: 'firepot', count: 2 }],
   },
   abbot: {
     defId: 'abbot',

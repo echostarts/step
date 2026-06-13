@@ -139,6 +139,8 @@ export interface UnitTemplate {
   xpValue?: number; // опыт за убийство (враги)
   aiRole?: 'brute' | 'flanker' | 'alchemist' | 'leader' | 'shooter';
   scale?: number;
+  /** что остаётся на теле (обыск) */
+  drops?: ItemStack[];
 }
 
 export interface Injury {

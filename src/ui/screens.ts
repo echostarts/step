@@ -135,6 +135,59 @@ export class Screens {
     this.show(box, 'result-screen');
   }
 
+  // ---------- Обыск ----------
+
+  lootScreen(opts: {
+    titleKey: string;
+    items: { icon: string; label: string }[];
+    onTakeAll(): void;
+    onClose(): void;
+  }): void {
+    const box = el('div', 'loot-box');
+    const h = el('h3', '');
+    h.textContent = t(opts.titleKey);
+    box.appendChild(h);
+    const list = el('div', 'loot-list');
+    if (!opts.items.length) {
+      const p = el('p', 'sheet-note');
+      p.textContent = '— пусто —';
+      list.appendChild(p);
+    }
+    for (const it of opts.items) {
+      const row = el('div', 'bp-item');
+      row.appendChild(iconEl(it.icon));
+      const span = el('span', '');
+      span.textContent = it.label;
+      row.appendChild(span);
+      list.appendChild(row);
+    }
+    box.appendChild(list);
+    const actions = el('div', 'loot-actions');
+    if (opts.items.length) actions.appendChild(menuBtn(t('char.takeAll'), opts.onTakeAll));
+    actions.appendChild(menuBtn(t('char.close'), opts.onClose));
+    box.appendChild(actions);
+    this.show(box, 'loot-screen');
+  }
+
+  // ---------- Лагерь ----------
+
+  campScreen(opts: { onSquad(): void; onNext(): void; onMenu(): void; hasLevelUps: boolean }): void {
+    const box = el('div', 'menu-box small');
+    const h = el('h2', 'screen-title');
+    h.textContent = t('camp.title');
+    box.appendChild(h);
+    const txt = el('div', 'result-text');
+    txt.textContent = t('camp.text');
+    box.appendChild(txt);
+    const list = el('div', 'menu-list');
+    const squadBtn = menuBtn(t('camp.squad') + (opts.hasLevelUps ? ' ↑' : ''), opts.onSquad);
+    list.appendChild(squadBtn);
+    list.appendChild(menuBtn(t('camp.next'), opts.onNext));
+    list.appendChild(menuBtn(t('menu.toMenu'), opts.onMenu));
+    box.appendChild(list);
+    this.show(box, 'camp-screen');
+  }
+
   // ---------- Титры ----------
 
   credits(onBack: () => void): void {

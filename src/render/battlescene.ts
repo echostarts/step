@@ -21,6 +21,8 @@ export interface BattleCallbacks {
   onMessage(key: string): void;
   /** обновить карточку врага под курсором (null — спрятать) */
   onEnemyHover(unit: UnitState | null): void;
+  /** обыск: клик по соседнему сундуку или телу */
+  onLoot?(at: Vec2, body: UnitState | null): void;
 }
 
 type TargetMode = { kind: 'none' } | { kind: 'aoe'; range: number } | { kind: 'heal'; slot: number };
@@ -235,6 +237,16 @@ export class BattleScene {
     if (this.battle.grid.kindAt(cell.x, cell.y) === 'door' && !this.battle.grid.isDoorOpen(cell.x, cell.y)) {
       await this.doAction({ type: 'openDoor', at: cell });
       return;
+    }
+    // обыск: сундук или тело вплотную
+    const adj = Math.abs(cell.x - u.pos.x) + Math.abs(cell.y - u.pos.y) <= 1;
+    if (adj && this.cb.onLoot) {
+      const isChest = this.battle.grid.charAt(cell.x, cell.y) === 'C';
+      const body = this.battle.bodyAt(cell);
+      if (isChest || (body && body.side === 'enemy' && !body.looted)) {
+        this.cb.onLoot(cell, body ?? null);
+        return;
+      }
     }
     // движение
     const reach = this.battle.reachableFor(u);
