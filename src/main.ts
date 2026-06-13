@@ -88,9 +88,9 @@ const app: App = {
   };
 
 const VILLAGE_NPCS: NpcSpawn[] = [
-  { defId: 'npc_elder', dialogue: 'elder', x: 7, y: 8 },
-  { defId: 'npc_herbalist', dialogue: 'herbalist', x: 31, y: 10 },
-  { defId: 'npc_boy', dialogue: 'boy', x: 23, y: 15 },
+  { defId: 'npc_elder', dialogue: 'elder', x: 7, y: 16 },
+  { defId: 'npc_herbalist', dialogue: 'herbalist', x: 40, y: 13 },
+  { defId: 'npc_boy', dialogue: 'boy', x: 26, y: 27 },
 ];
 
 // ---------- Маршрутизатор сцен ----------

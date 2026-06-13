@@ -211,42 +211,86 @@ export class MapView {
 
   // ---------- Укрытия ----------
 
+  /** инстансим повторяющиеся укрытия (изгороди, бочки, ящики) */
+  private async buildInstancedCovers(grid: Grid): Promise<void> {
+    type Placement = { m: THREE.Matrix4 };
+    const fences: Placement[] = [];
+    const barrels: Placement[] = [];
+    const boxes: Placement[] = [];
+    const m = new THREE.Matrix4();
+    const ry = new THREE.Matrix4();
+    const t = new THREE.Matrix4();
+    for (let y = 0; y < grid.h; y++) {
+      for (let x = 0; x < grid.w; x++) {
+        const ch = grid.charAt(x, y);
+        const jr = cellHash(x * 5 + 2, y * 11 + 7);
+        const cx = x * CELL;
+        const cz = y * CELL;
+        if (ch === 'f') {
+          const horizontal = grid.charAt(x + 1, y) === 'f' || grid.charAt(x - 1, y) === 'f';
+          // barrier_half: x 0..2 -> сдвиг -1, поворот по линии
+          ry.makeRotationY(horizontal ? 0 : Math.PI / 2);
+          t.makeTranslation(-1, 0, 0);
+          m.makeTranslation(cx, 0, cz).multiply(ry).multiply(t);
+          fences.push({ m: m.clone() });
+        } else if (ch === 'b') {
+          for (const [dx, dz] of [
+            [-0.35, -0.25],
+            [0.45, 0.3],
+            [-0.3, 0.5],
+          ]) {
+            ry.makeRotationY(jr * 6.28 + dx);
+            m.makeTranslation(cx + dx, 0, cz + dz).multiply(ry);
+            barrels.push({ m: m.clone() });
+          }
+        } else if (ch === 'x') {
+          for (const [dx, dy, dz] of [
+            [-0.4, 0, 0.1],
+            [0.5, 0, -0.3],
+            [0.05, 1.0, -0.1],
+          ]) {
+            ry.makeRotationY(dy > 0 ? 0.4 : jr);
+            m.makeTranslation(cx + dx, dy, cz + dz).multiply(ry);
+            boxes.push({ m: m.clone() });
+          }
+        }
+      }
+    }
+    await this.instanceModel('barrier_half', fences);
+    await this.instanceModel('barrel_small', barrels);
+    await this.instanceModel('box_small', boxes);
+  }
+
+  private async instanceModel(key: string, placements: { m: THREE.Matrix4 }[]): Promise<void> {
+    if (!placements.length) return;
+    const meshes = await assets.dungeonRaw(key);
+    for (const src of meshes) {
+      const inst = new THREE.InstancedMesh(src.geometry, src.material, placements.length);
+      inst.castShadow = true;
+      inst.receiveShadow = true;
+      // учесть локальную матрицу меша внутри модели
+      const local = src.matrixWorld.clone();
+      const tmp = new THREE.Matrix4();
+      placements.forEach((p, i) => {
+        tmp.multiplyMatrices(p.m, local);
+        inst.setMatrixAt(i, tmp);
+      });
+      inst.instanceMatrix.needsUpdate = true;
+      this.group.add(inst);
+    }
+  }
+
   private async buildCovers(grid: Grid): Promise<void> {
+    // изгороди и бочки/ящики — частые повторяющиеся меши: инстансим их,
+    // чтобы на карте 48×32 не плодить сотни вызовов отрисовки
+    await this.buildInstancedCovers(grid);
     for (let y = 0; y < grid.h; y++) {
       for (let x = 0; x < grid.w; x++) {
         const ch = grid.charAt(x, y);
         const pos = cellToWorld(x, y);
         const jr = cellHash(x * 5 + 2, y * 11 + 7);
         let obj: THREE.Object3D | null = null;
-        if (ch === 'b') {
-          obj = new THREE.Group();
-          const b1 = await assets.dungeon('barrel_small');
-          const b2 = await assets.dungeon('barrel_small');
-          const b3 = await assets.dungeon('barrel_small');
-          b1.position.set(-0.35, 0, -0.25);
-          b2.position.set(0.45, 0, 0.3);
-          b3.position.set(-0.3, 0, 0.5);
-          obj.add(b1, b2, b3);
-        } else if (ch === 'x') {
-          obj = new THREE.Group();
-          const c1 = await assets.dungeon('box_small');
-          const c2 = await assets.dungeon('box_small');
-          const c3 = await assets.dungeon('box_small_decorated');
-          c1.position.set(-0.4, 0, 0.1);
-          c2.position.set(0.5, 0, -0.3);
-          c3.position.set(0.05, 1.0, -0.1);
-          c3.rotation.y = 0.4;
-          obj.add(c1, c2, c3);
-        } else if (ch === 'f') {
-          // barrier_half тянется 0..2 по x — центрируем и ориентируем вдоль линии изгороди
-          const horizontal = grid.charAt(x + 1, y) === 'f' || grid.charAt(x - 1, y) === 'f';
-          const seg = await assets.dungeon('barrier_half');
-          seg.position.x = -1;
-          const wrap = new THREE.Group();
-          wrap.add(seg);
-          wrap.rotation.y = horizontal ? 0 : Math.PI / 2;
-          obj = wrap;
-        } else if (ch === 'T') {
+        if (ch === 'T') {
           obj = await assets.dungeon(jr > 0.5 ? 'table_medium' : 'table_medium_broken');
         } else if (ch === 'C') {
           obj = await assets.dungeon('chest');

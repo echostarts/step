@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { clone as cloneSkeleton } from 'three/examples/jsm/utils/SkeletonUtils.js';
 
 /**
  * Загрузчик ассетов KayKit. Все модели — GLB/GLTF из /public/assets.
@@ -100,8 +101,7 @@ export class Assets {
   async character(key: string): Promise<CharacterAsset> {
     const g = await this.load(characterUrl(key));
     if (g) {
-      const { clone } = await import('three/examples/jsm/utils/SkeletonUtils.js');
-      const scene = clone(g.scene) as THREE.Group;
+      const scene = cloneSkeleton(g.scene) as THREE.Group;
       return { scene, clips: g.animations };
     }
     return { scene: placeholderCharacter(), clips: [] };
