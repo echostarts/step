@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { ENEMIES, SQUAD } from '../data/units';
+import { ENEMIES, NPCS, SQUAD } from '../data/units';
 import { applyPalette, assets } from './assets';
 
 /**
@@ -11,7 +11,7 @@ const cache = new Map<string, string>();
 export async function portraitFor(defId: string): Promise<string> {
   const hit = cache.get(defId);
   if (hit) return hit;
-  const tpl = SQUAD.find((s) => s.defId === defId) ?? ENEMIES[defId];
+  const tpl = SQUAD.find((s) => s.defId === defId) ?? ENEMIES[defId] ?? NPCS[defId];
   if (!tpl) return '';
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setSize(160, 200);

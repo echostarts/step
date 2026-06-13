@@ -14,6 +14,7 @@ import { MapView } from './mapview';
 import { TacticalOverlay } from './overlay';
 import { CELL, cellToWorld, type IsoScene } from './scene';
 import { UnitView } from './unitview';
+import { WallFader } from './wallfade';
 
 export interface BattleCallbacks {
   onHudRefresh(): void;
@@ -47,7 +48,6 @@ export class BattleScene {
   private hoverCell: Vec2 | null = null;
   private raycaster = new THREE.Raycaster();
   private floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-  private fadedWalls = new Map<THREE.Material, number>();
   private disposed = false;
 
   constructor(
@@ -532,73 +532,19 @@ export class BattleScene {
     this.updateWallFade();
   }
 
-  private wallMeshList: THREE.Mesh[] | null = null;
-  private wallWanted = new Set<THREE.Material>();
-  private lastFadeCheck = 0;
+  private wallFader: WallFader | null = null;
 
   /** стены, заслоняющие бойцов, становятся полупрозрачными */
   private updateWallFade(): void {
-    const now = performance.now();
-    // сам рейкаст — дросселирован; плавность опасити — каждый кадр
-    if (now - this.lastFadeCheck > 140) {
-      this.lastFadeCheck = now;
-      if (!this.wallMeshList) {
-        this.wallMeshList = [];
-        for (const parts of this.mapView.wallMeshes.values())
-          for (const part of parts)
-            part.traverse((o) => {
-              const mesh = o as THREE.Mesh;
-              if (mesh.isMesh) {
-                // материал должен быть уникальным, чтобы гасить только эту стену
-                if (!(mesh.userData.fadeOwned as boolean)) {
-                  mesh.material = (mesh.material as THREE.Material).clone();
-                  mesh.userData.fadeOwned = true;
-                }
-                this.wallMeshList!.push(mesh);
-              }
-            });
-      }
-      this.wallWanted.clear();
-      const camPos = this.iso.camera.position;
-      for (const u of this.battle.state.units) {
-        if (u.side !== 'player' || u.down) continue;
-        const v = this.views.get(u.id);
-        if (!v) continue;
-        const target = v.root.position.clone().add(new THREE.Vector3(0, 1.2, 0));
-        const dir = target.clone().sub(camPos).normalize();
-        this.raycaster.set(camPos, dir);
-        this.raycaster.far = target.distanceTo(camPos) - 1.2;
-        const hits = this.raycaster.intersectObjects(this.wallMeshList, false);
-        for (const h of hits) {
-          if (!h.object.visible) continue;
-          const mesh = h.object as THREE.Mesh;
-          const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-          for (const m of mats) this.wallWanted.add(m);
-        }
-      }
-      this.raycaster.far = Infinity;
+    if (!this.wallFader) this.wallFader = new WallFader(this.mapView);
+    const targets: THREE.Vector3[] = [];
+    for (const u of this.battle.state.units) {
+      if (u.side !== 'player' || u.down) continue;
+      const v = this.views.get(u.id);
+      if (v) targets.push(v.root.position);
     }
-    for (const m of this.wallWanted) {
-      const cur = this.fadedWalls.get(m) ?? 1;
-      const next = Math.max(0.22, cur - 0.12);
-      this.fadedWalls.set(m, next);
-      applyFade(m, next);
-    }
-    for (const [m, cur] of this.fadedWalls) {
-      if (this.wallWanted.has(m)) continue;
-      const next = Math.min(1, cur + 0.08);
-      applyFade(m, next);
-      if (next >= 1) this.fadedWalls.delete(m);
-      else this.fadedWalls.set(m, next);
-    }
+    this.wallFader.update(this.iso.camera, targets);
   }
-}
-
-function applyFade(m: THREE.Material, opacity: number): void {
-  m.transparent = opacity < 1;
-  m.opacity = opacity;
-  m.depthWrite = opacity >= 0.6;
-  m.needsUpdate = false;
 }
 
 function statusLabel(s: string): string {

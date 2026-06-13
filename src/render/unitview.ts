@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import type { UnitState, WeaponDef } from '../game/types';
 import { itemDef } from '../data/items';
-import { ENEMIES, SQUAD } from '../data/units';
+import { ENEMIES, NPCS, SQUAD } from '../data/units';
 import { applyPalette, assets, PALETTES } from './assets';
 import { CELL, cellToWorld } from './scene';
 import { makeGlowTexture } from './mapview';
@@ -28,7 +28,7 @@ const CLIP = {
 };
 
 function templateFor(u: UnitState) {
-  return SQUAD.find((s) => s.defId === u.defId) ?? ENEMIES[u.defId];
+  return SQUAD.find((s) => s.defId === u.defId) ?? ENEMIES[u.defId] ?? NPCS[u.defId];
 }
 
 /**

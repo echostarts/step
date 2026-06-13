@@ -69,6 +69,41 @@ export const SQUAD: UnitTemplate[] = [
   },
 ];
 
+/** Мирные жители (для исследования и портретов в диалогах). */
+export const NPCS: Record<string, UnitTemplate> = {
+  npc_elder: {
+    defId: 'npc_elder',
+    nameKey: 'npc.elder',
+    side: 'player',
+    stats: { str: 3, dex: 3, wil: 3, int: 5 },
+    baseHp: 8,
+    model: 'Knight',
+    palette: 'npc_elder',
+    weaponId: 'claws',
+  },
+  npc_herbalist: {
+    defId: 'npc_herbalist',
+    nameKey: 'npc.herbalist',
+    side: 'player',
+    stats: { str: 2, dex: 4, wil: 6, int: 7 },
+    baseHp: 8,
+    model: 'Mage',
+    palette: 'npc_herbalist',
+    weaponId: 'claws',
+  },
+  npc_boy: {
+    defId: 'npc_boy',
+    nameKey: 'npc.boy',
+    side: 'player',
+    stats: { str: 2, dex: 6, wil: 4, int: 4 },
+    baseHp: 6,
+    model: 'Rogue',
+    palette: 'npc_boy',
+    weaponId: 'claws',
+    scale: 0.78,
+  },
+};
+
 /** Шаблоны врагов. */
 export const ENEMIES: Record<string, UnitTemplate> = {
   ghul: {

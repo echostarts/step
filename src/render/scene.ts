@@ -49,6 +49,16 @@ export class IsoScene {
     this.scene.background = new THREE.Color(0x0b0f16);
     this.scene.fog = new THREE.FogExp2(0x10151f, 0.0095);
 
+    // подложка под картой — мягкий уход в туман вместо жёсткого края
+    const ground = new THREE.Mesh(
+      new THREE.PlaneGeometry(600, 600),
+      new THREE.MeshStandardMaterial({ color: 0x131720, roughness: 1 }),
+    );
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -0.22;
+    ground.receiveShadow = true;
+    this.scene.add(ground);
+
     const ambient = new THREE.AmbientLight(0x52628a, 1.05);
     this.scene.add(ambient);
     const hemi = new THREE.HemisphereLight(0x3c4d70, 0x221a12, 0.7);

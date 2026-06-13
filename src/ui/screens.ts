@@ -188,6 +188,22 @@ export class Screens {
     this.show(box, 'camp-screen');
   }
 
+  // ---------- Эпилог ----------
+
+  epilogue(opts: { titleKey: string; textKey: string; onCredits(): void; onMenu(): void }): void {
+    const box = el('div', 'epilogue-box');
+    const h = el('h2', '');
+    h.textContent = t(opts.titleKey);
+    const text = el('div', 'epilogue-text');
+    text.textContent = t(opts.textKey);
+    box.append(h, text);
+    const list = el('div', 'menu-list');
+    list.appendChild(menuBtn(t('epilogue.credits'), opts.onCredits));
+    list.appendChild(menuBtn(t('epilogue.toMenu'), opts.onMenu));
+    box.appendChild(list);
+    this.show(box, 'epilogue-screen');
+  }
+
   // ---------- Титры ----------
 
   credits(onBack: () => void): void {
